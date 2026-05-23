@@ -1,4 +1,6 @@
-const JWT_SECRET = 'sinomiai_super_secret_key_2026';
+import jwt from 'jsonwebtoken';
+
+const JWT_SECRET = process.env.JWT_SECRET;
 
 export const authenticateToken = (req, res, next) => {
     const authHeader = req.headers['authorization'];

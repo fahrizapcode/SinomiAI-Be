@@ -1,13 +1,8 @@
-import db from '../db.js';
+import Product from '../models/Product.js';
 
 export const getProducts = async (req, res) => {
   try {
-    const [products] = await db.query(`
-      SELECT p.*, u.name as seller_name 
-      FROM products p 
-      JOIN users u ON p.user_id = u.id 
-      ORDER BY p.created_at DESC
-    `);
+    const products = await Product.findAll();
     res.json(products);
   } catch (error) {
     console.error(error);
@@ -17,12 +12,7 @@ export const getProducts = async (req, res) => {
 
 export const getProductById = async (req, res) => {
   try {
-    const [products] = await db.query(`
-      SELECT p.*, u.name as seller_name
-      FROM products p 
-      JOIN users u ON p.user_id = u.id 
-      WHERE p.id = ?
-    `, [req.params.id]);
+    const products = await Product.findById(req.params.id);
 
     if (products.length === 0) return res.status(404).json({ error: 'Product not found' });
     res.json(products[0]);
@@ -42,12 +32,19 @@ export const addProduct = async (req, res) => {
       image_url = `data:${req.file.mimetype};base64,${base64Image}`;
     }
 
-    const [result] = await db.query(
-      'INSERT INTO products (user_id, name, description, category, price, image_url, location, whatsapp_number, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-      [req.user.id, name, description, category, price, image_url, location, whatsapp_number, status || 'tersedia']
-    );
+    const newProduct = await Product.create({
+      user_id: req.user.id,
+      name,
+      description,
+      category,
+      price,
+      image_url,
+      location,
+      whatsapp_number,
+      status
+    });
 
-    res.json({ id: result.insertId, message: 'Product created successfully' });
+    res.json({ id: newProduct.id, message: 'Product created successfully' });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Server error' });

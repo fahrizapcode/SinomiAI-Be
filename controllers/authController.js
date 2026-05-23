@@ -1,23 +1,26 @@
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
-import db from '../db.js';
+import User from '../models/User.js';
 
-const JWT_SECRET = 'sinomiai_super_secret_key_2026';
+const JWT_SECRET = process.env.JWT_SECRET;
 
 export const register = async (req, res) => {
     try {
         const { name, email, password, whatsapp_number, location } = req.body;
-        const [existing] = await db.query('SELECT * FROM users WHERE email = ?', [email]);
+        const existing = await User.findByEmail(email);
         if (existing.length > 0) return res.status(400).json({ error: 'Email sudah terdaftar' });
 
         const hashedPassword = await bcrypt.hash(password, 10);
-        const [result] = await db.query(
-            'INSERT INTO users (name, email, password_hash, whatsapp_number, location) VALUES (?, ?, ?, ?, ?)',
-            [name, email, hashedPassword, whatsapp_number, location]
-        );
+        const newUser = await User.create({
+            name,
+            email,
+            password_hash: hashedPassword,
+            whatsapp_number,
+            location
+        });
 
-        const token = jwt.sign({ id: result.insertId, email }, JWT_SECRET, { expiresIn: '7d' });
-        res.json({ token, user: { id: result.insertId, name, email, whatsapp_number, location } });
+        const token = jwt.sign({ id: newUser.id, email }, JWT_SECRET, { expiresIn: '7d' });
+        res.json({ token, user: { id: newUser.id, name, email, whatsapp_number, location } });
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Server error' });
@@ -27,7 +30,7 @@ export const register = async (req, res) => {
 export const login = async (req, res) => {
     try {
         const { email, password } = req.body;
-        const [users] = await db.query('SELECT * FROM users WHERE email = ?', [email]);
+        const users = await User.findByEmail(email);
         if (users.length === 0) return res.status(400).json({ error: 'Email atau password salah' });
 
         const user = users[0];
@@ -44,7 +47,7 @@ export const login = async (req, res) => {
 
 export const authMe = async (req, res) => {
     try {
-        const [users] = await db.query('SELECT id, name, email, whatsapp_number, location FROM users WHERE id = ?', [req.user.id]);
+        const users = await User.findById(req.user.id, 'id, name, email, whatsapp_number, location');
         if (users.length === 0) return res.status(404).json({ error: 'User not found' });
         res.json({ user: users[0] });
     } catch (error) {
