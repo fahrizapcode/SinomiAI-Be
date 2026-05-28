@@ -4,7 +4,6 @@ import { initUserModel } from './models/User.js';
 import { initProductModel } from './models/Product.js';
 import authRoutes from './routes/authRoutes.js';
 import productRoutes from './routes/productRoutes.js';
-import classifyRoutes from './routes/classifyRoutes.js';
 import generateRoutes from './routes/generateRoutes.js';
 
 const app = express();
@@ -15,7 +14,6 @@ app.use(express.json());
 
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
-app.use('/api/classify', classifyRoutes);
 app.use('/api/generate', generateRoutes);
 
 async function startServer() {
