@@ -19,9 +19,9 @@ const allowedOrigins = [
 app.use(cors({
   origin: function (origin, callback) {
     if (!origin) return callback(null, true);
-    const isAllowed = allowedOrigins.includes(origin) || 
-                      origin.startsWith('http://localhost:') || 
-                      origin.startsWith('http://127.0.0.1:');
+    const isAllowed = allowedOrigins.includes(origin) ||
+      origin.startsWith('http://localhost:') ||
+      origin.startsWith('http://127.0.0.1:');
     if (isAllowed) {
       callback(null, true);
     } else {

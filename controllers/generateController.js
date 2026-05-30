@@ -44,8 +44,8 @@ Formatnya HARUS persis seperti ini:
         let retries = 3;
         for (let i = 0; i < retries; i++) {
             try {
-                // Menggunakan model gemini-1.5-flash yang biasanya lebih tahan banting dan limitnya lebih tinggi
-                const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+                // Menggunakan model gemini-2.5-flash yang aktif dan didukung penuh
+                const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
                 result = await model.generateContent(prompt);
                 break; // sukses, keluar dari loop
             } catch (err) {
@@ -99,7 +99,7 @@ Pastikan struktur JSON yang dikembalikan persis seperti ini:
         let retries = 3;
         for (let i = 0; i < retries; i++) {
             try {
-                const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+                const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
                 result = await model.generateContent(prompt);
                 break;
             } catch (err) {
